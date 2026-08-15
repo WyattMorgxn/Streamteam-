@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0d0b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>CoStream — find who you stream with next</title>
+<style>
+  :root{
+    --bg:#0d0b14;
+    --surface:#17141f;
+    --surface-2:#221d31;
+    --line:#2e2840;
+    --brand:#a855f7;
+    --brand-2:#6d28d9;
+    --like:#22c55e;
+    --pass:#f43f5e;
+    --live:#ef4444;
+    --text:#f4f2f8;
+    --muted:#9a92ae;
+    --muted-2:#6f677f;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:#08070d;
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  /* ---------- phone shell ---------- */
+  #phone{
+    position:relative;
+    width:100%;max-width:430px;
+    height:100dvh;max-height:932px;
+    background:var(--bg);
+    overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  @media (min-width:520px) and (min-height:800px){
+    #phone{border-radius:44px;box-shadow:0 0 0 10px #16131f,0 0 0 12px #2c2640,0 40px 90px rgba(0,0,0,.7);height:900px;}
+  }
+  .safe-top{height:env(safe-area-inset-top,0px);flex:none;}
+
+  /* ---------- top bar ---------- */
+  header{
+    flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px 10px;
+  }
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;letter-spacing:-.4px;}
+  .logo .dot{
+    width:26px;height:26px;border-radius:9px;flex:none;
+    background:linear-gradient(140deg,var(--brand),#ec4899);
+    display:grid;place-items:center;font-size:14px;
+  }
+  .hdr-note{font-size:12px;color:var(--muted-2);font-weight:600;}
+
+  /* ---------- screens ---------- */
+  main{flex:1;position:relative;overflow:hidden;}
+  .screen{
+    position:absolute;inset:0;display:none;flex-direction:column;
+  }
+  .screen.active{display:flex;}
+  .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 18px 24px;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  h2.title{font-size:24px;margin:6px 0 4px;letter-spacing:-.5px;}
+  p.sub{font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.5;}
+
+  /* ---------- swipe deck ---------- */
+  #deck{
+    flex:1;position:relative;margin:4px 18px 0;
+  }
+  .card{
+    position:absolute;inset:0;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:26px;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    will-change:transform;
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+  }
+  .card.animate{transition:transform .32s cubic-bezier(.22,.7,.3,1),opacity .32s ease;}
+  .card-art{
+    height:44%;flex:none;position:relative;
+    display:grid;place-items:center;
+    font-size:74px;
+  }
+  .card-art::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to bottom,rgba(0,0,0,0) 40%,var(--surface));
+  }
+  .badges{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:7px;z-index:2;flex-wrap:wrap;}
+  .badge{
+    font-size:11px;font-weight:700;letter-spacing:.3px;
+    padding:5px 9px;border-radius:99px;
+    background:rgba(12,10,18,.62);backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.13);
+  }
+  .badge.live{background:var(--live);border-color:transparent;display:flex;align-items:center;gap:5px;}
+  .badge.live i{width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+  .card-body{flex:1;padding:0 20px 18px;display:flex;flex-direction:column;min-height:0;}
+  .name-row{display:flex;align-items:baseline;gap:9px;}
+  .name{font-size:26px;font-weight:800;letter-spacing:-.6px;}
+  .plat{font-size:12px;color:var(--muted);font-weight:600;}
+  .stats{display:flex;gap:16px;margin:12px 0 12px;}
+  .stat{flex:1;background:var(--surface-2);border-radius:14px;padding:9px 11px;}
+  .stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted-2);font-weight:700;}
+  .stat .v{font-size:14px;font-weight:700;margin-top:3px;}
+  .bio{font-size:14px;line-height:1.5;color:#ddd6ea;overflow-y:auto;flex:1;min-height:0;}
+  .bio::-webkit-scrollbar{display:none;}
+  .goal-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted-2);font-weight:700;margin:14px 0 7px;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag{
+    font-size:12px;font-weight:600;padding:6px 10px;border-radius:99px;
+    background:rgba(168,85,247,.14);color:#d8b4fe;border:1px solid rgba(168,85,247,.3);
+  }
+
+  /* swipe stamps */
+  .stamp{
+    position:absolute;top:26px;z-index:3;
+    font-size:22px;font-weight:900;letter-spacing:1px;
+    padding:8px 14px;border-radius:12px;border:3px solid;
+    opacity:0;transform:rotate(-14deg);
+  }
+  .stamp.yes{left:20px;color:var(--like);border-color:var(--like);transform:rotate(-14deg);}
+  .stamp.no{right:20px;color:var(--pass);border-color:var(--pass);transform:rotate(14deg);}
+
+  /* action row */
+  .actions{
+    flex:none;display:flex;align-items:center;justify-content:center;gap:22px;
+    padding:18px 0 10px;
+  }
+  .act{
+    width:62px;height:62px;border-radius:50%;border:1px solid var(--line);
+    background:var(--surface);color:#fff;font-size:25px;
+    display:grid;place-items:center;cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .act:active{transform:scale(.9);}
+  .act.no{color:var(--pass);}
+  .act.yes{color:#fff;background:linear-gradient(140deg,var(--brand),var(--brand-2));border-color:transparent;width:70px;height:70px;font-size:28px;box-shadow:0 10px 24px rgba(124,58,237,.4);}
+
+  .empty{
+    position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;
+  }
+  .empty .in{max-width:280px;}
+  .empty h3{font-size:20px;margin:0 0 8px;}
+  .empty p{font-size:13.5px;color:var(--muted);line-height:1.6;margin:0 0 20px;}
+
+  .btn{
+    display:inline-block;border:none;cursor:pointer;font-family:inherit;
+    background:linear-gradient(140deg,var(--brand),var(--brand-2));color:#fff;
+    font-size:15px;font-weight:700;padding:13px 22px;border-radius:14px;
+  }
+  .btn.ghost{background:var(--surface-2);border:1px solid var(--line);}
+  .btn:active{opacity:.8;}
+
+  /* ---------- lists ---------- */
+  .row{
+    display:flex;align-items:center;gap:13px;padding:12px;border-radius:18px;
+    background:var(--surface);border:1px solid var(--line);margin-bottom:10px;cursor:pointer;
+  }
+  .row:active{background:var(--surface-2);}
+  .av{
+    width:52px;height:52px;border-radius:16px;flex:none;display:grid;place-items:center;font-size:26px;
+  }
+  .row-main{flex:1;min-width:0;}
+  .row-main .n{font-weight:700;font-size:15.5px;display:flex;align-items:center;gap:6px;}
+  .row-main .m{font-size:12.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chev{color:var(--muted-2);font-size:18px;}
+  .lock-pill{font-size:10px;font-weight:700;color:var(--muted-2);background:var(--surface-2);padding:4px 8px;border-radius:99px;border:1px solid var(--line);}
+  .new-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex:none;}
+
+  .section-h{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted-2);font-weight:800;margin:18px 0 10px;}
+
+  .blank{text-align:center;padding:50px 24px;color:var(--muted);font-size:13.5px;line-height:1.6;}
+  .blank .big{font-size:38px;margin-bottom:12px;}
+
+  /* ---------- overlay panels (chat / clips / match) ---------- */
+  .panel{
+    position:absolute;inset:0;background:var(--bg);z-index:40;
+    display:none;flex-direction:column;
+  }
+  .panel.open{display:flex;animation:slideIn .24s ease;}
+  @keyframes slideIn{from{transform:translateX(28px);opacity:0}to{transform:none;opacity:1}}
+  .panel-hd{
+    flex:none;display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);
+  }
+  .back{font-size:22px;color:var(--muted);cursor:pointer;padding:2px 6px 2px 0;}
+  .panel-hd .who{flex:1;min-width:0;}
+  .panel-hd .who .n{font-weight:700;font-size:16px;}
+  .panel-hd .who .m{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+  .msgs{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px;}
+  .msgs::-webkit-scrollbar{display:none;}
+  .msg{max-width:76%;padding:10px 14px;border-radius:18px;font-size:14.5px;line-height:1.45;}
+  .msg.them{background:var(--surface-2);align-self:flex-start;border-bottom-left-radius:6px;}
+  .msg.me{background:linear-gradient(140deg,var(--brand),var(--brand-2));align-self:flex-end;border-bottom-right-radius:6px;}
+  .sysline{text-align:center;font-size:11.5px;color:var(--muted-2);padding:6px 20px;line-height:1.5;}
+
+  .composer{
+    flex:none;display:flex;gap:9px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--line);align-items:center;
+  }
+  .composer input{
+    flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:99px;padding:12px 16px;font-size:15px;font-family:inherit;outline:none;
+  }
+  .composer input::placeholder{color:var(--muted-2);}
+  .send{
+    width:44px;height:44px;border-radius:50%;border:none;flex:none;cursor:pointer;
+    background:linear-gradient(140deg,var(--brand),var(--brand-2));color:#fff;font-size:17px;
+  }
+  .locked-bar{
+    flex:none;margin:0 14px calc(14px + env(safe-area-inset-bottom,0px));
+    background:var(--surface);border:1px dashed var(--line);border-radius:16px;
+    padding:14px 16px;text-align:center;font-size:13px;color:var(--muted);line-height:1.55;
+  }
+  .locked-bar b{color:var(--text);}
+
+  /* clips */
+  .clip{
+    background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:12px;
+  }
+  .clip-thumb{height:150px;display:grid;place-items:center;font-size:44px;position:relative;}
+  .clip-thumb .dur{
+    position:absolute;bottom:9px;right:9px;font-size:11px;font-weight:700;
+    background:rgba(0,0,0,.65);padding:3px 7px;border-radius:6px;
+  }
+  .clip-thumb .play{
+    width:52px;height:52px;border-radius:50%;background:rgba(10,8,16,.55);
+    backdrop-filter:blur(6px);display:grid;place-items:center;font-size:19px;border:1px solid rgba(255,255,255,.18);
+  }
+  .clip-meta{padding:11px 14px;}
+  .clip-meta .t{font-size:14px;font-weight:700;line-height:1.35;}
+  .clip-meta .v{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  /* match celebration */
+  #match{
+    position:absolute;inset:0;z-index:60;display:none;
+    background:radial-gradient(120% 80% at 50% 20%,rgba(168,85,247,.35),rgba(13,11,20,.97) 65%),rgba(13,11,20,.97);
+    backdrop-filter:blur(6px);
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px;
+  }
+  #match.open{display:flex;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  #match .kicker{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:#d8b4fe;font-weight:800;}
+  #match h1{font-size:38px;margin:8px 0 6px;letter-spacing:-1.4px;line-height:1.05;}
+  #match p{font-size:14px;color:#c9c1da;line-height:1.6;margin:0 0 26px;max-width:290px;}
+  .avpair{display:flex;align-items:center;gap:-10px;margin:22px 0 4px;}
+  .avpair .b{
+    width:84px;height:84px;border-radius:26px;display:grid;place-items:center;font-size:40px;
+    border:3px solid var(--bg);
+  }
+  .avpair .b:last-child{margin-left:-18px;}
+  #match .btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:260px;}
+
+  /* toast */
+  #toast{
+    position:absolute;left:16px;right:16px;bottom:96px;z-index:70;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:16px;
+    padding:13px 16px;font-size:13px;line-height:1.5;color:#e4dff0;
+    opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s ease;
+    box-shadow:0 12px 30px rgba(0,0,0,.5);
+  }
+  #toast.show{opacity:1;transform:none;}
+  #toast b{color:#fff;}
+
+  /* ---------- tab bar ---------- */
+  nav{
+    flex:none;display:flex;border-top:1px solid var(--line);background:var(--bg);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .tab{
+    flex:1;padding:11px 0 10px;text-align:center;cursor:pointer;color:var(--muted-2);position:relative;
+  }
+  .tab .ic{font-size:20px;line-height:1;}
+  .tab .lb{font-size:10.5px;font-weight:700;margin-top:4px;letter-spacing:.2px;}
+  .tab.on{color:var(--brand);}
+  .tab .count{
+    position:absolute;top:6px;left:calc(50% + 8px);
+    background:var(--pass);color:#fff;font-size:10px;font-weight:800;
+    min-width:17px;height:17px;border-radius:99px;display:grid;place-items:center;padding:0 4px;
+  }
+
+  /* profile screen bits */
+  .me-card{
+    background:linear-gradient(150deg,rgba(168,85,247,.18),var(--surface));
+    border:1px solid var(--line);border-radius:22px;padding:20px;text-align:center;margin-bottom:16px;
+  }
+  .me-card .av{width:72px;height:72px;border-radius:24px;margin:0 auto 12px;font-size:34px;}
+  .me-card .n{font-size:20px;font-weight:800;}
+  .me-card .h{font-size:13px;color:var(--muted);margin-top:5px;}
+  .grid3{display:flex;gap:9px;margin-bottom:16px;}
+  .g{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 10px;text-align:center;}
+  .g .v{font-size:21px;font-weight:800;}
+  .g .k{font-size:10.5px;color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+  .info{
+    background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;
+    font-size:13px;color:var(--muted);line-height:1.65;
+  }
+  .info b{color:var(--text);}
+  .info ul{margin:9px 0 0;padding-left:18px;}
+  .info li{margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div id="phone">
+  <div class="safe-top"></div>
+
+  <header>
+    <div class="logo"><span class="dot">◆</span> CoStream</div>
+    <div class="hdr-note" id="hdrNote">demo mode</div>
+  </header>
+
+  <main>
+    <!-- ===== SWIPE ===== -->
+    <section class="screen active" id="s-swipe">
+      <div id="deck"></div>
+      <div class="actions">
+        <div class="act no" id="btnNo">✕</div>
+        <div class="act yes" id="btnYes">◆</div>
+      </div>
+    </section>
+
+    <!-- ===== MATCHES ===== -->
+    <section class="screen" id="s-matches">
+      <div class="scroll">
+        <h2 class="title">Collabs</h2>
+        <p class="sub">You both swiped. Chat is unlocked — go plan a stream.</p>
+        <div id="matchList"></div>
+      </div>
+    </section>
+
+    <!-- ===== FOLLOWING ===== -->
+    <section class="screen" id="s-following">
+      <div class="scroll">
+        <h2 class="title">Following</h2>
+        <p class="sub">You swiped, they haven't yet. You can watch their clips — chat unlocks if they swipe back.</p>
+        <div id="followList"></div>
+      </div>
+    </section>
+
+    <!-- ===== PROFILE ===== -->
+    <section class="screen" id="s-me">
+      <div class="scroll">
+        <div class="me-card">
+          <div class="av" style="background:linear-gradient(140deg,#a855f7,#ec4899)">🎮</div>
+          <div class="n">You</div>
+          <div class="h">Twitch · 6.8K followers · Mon/Wed/Fri 7pm ET</div>
+        </div>
+        <div class="grid3">
+          <div class="g"><div class="v" id="mCollabs">0</div><div class="k">Collabs</div></div>
+          <div class="g"><div class="v" id="mFollowing">0</div><div class="k">Following</div></div>
+          <div class="g"><div class="v" id="mWaiting">0</div><div class="k">Waiting</div></div>
+        </div>
+        <div class="info">
+          <b>How CoStream works</b>
+          <ul>
+            <li>Swipe ◆ on a streamer you'd want to go live with.</li>
+            <li>If they swipe you back, it's a <b>collab</b> — chat unlocks for both of you.</li>
+            <li>If they don't, you become a <b>follower</b>: you can watch their clips, but chat stays locked until they swipe back.</li>
+            <li>Swipe ✕ and they disappear from your deck.</li>
+          </ul>
+        </div>
+        <div style="height:14px"></div>
+        <button class="btn ghost" id="btnReset" style="width:100%">Reset the demo</button>
+        <div style="height:20px"></div>
+      </div>
+    </section>
+
+    <!-- ===== CHAT PANEL ===== -->
+    <div class="panel" id="p-chat">
+      <div class="panel-hd">
+        <div class="back" data-close="p-chat">‹</div>
+        <div class="av" id="chatAv" style="width:40px;height:40px;border-radius:13px;font-size:20px"></div>
+        <div class="who"><div class="n" id="chatName"></div><div class="m" id="chatMeta"></div></div>
+      </div>
+      <div class="msgs" id="chatMsgs"></div>
+      <div class="composer" id="chatComposer">
+        <input id="chatInput" placeholder="Pitch a collab…" autocomplete="off">
+        <button class="send" id="chatSend">➤</button>
+      </div>
+    </div>
+
+    <!-- ===== CLIPS PANEL ===== -->
+    <div class="panel" id="p-clips">
+      <div class="panel-hd">
+        <div class="back" data-close="p-clips">‹</div>
+        <div class="av" id="clipAv" style="width:40px;height:40px;border-radius:13px;font-size:20px"></div>
+        <div class="who"><div class="n" id="clipName"></div><div class="m" id="clipMeta"></div></div>
+      </div>
+      <div class="scroll" style="padding-top:16px" id="clipList"></div>
+      <div class="locked-bar" id="clipLock"></div>
+    </div>
+
+    <!-- ===== MATCH CELEBRATION ===== -->
+    <div id="match">
+      <div class="kicker">It's a collab</div>
+      <h1 id="matchTitle">You're both in.</h1>
+      <div class="avpair"><div class="b" style="background:linear-gradient(140deg,#a855f7,#ec4899)">🎮</div><div class="b" id="matchAv"></div></div>
+      <p id="matchLine"></p>
+      <div class="btns">
+        <button class="btn" id="matchChat">Send a message</button>
+        <button class="btn ghost" id="matchKeep">Keep swiping</button>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+  </main>
+
+  <nav>
+    <div class="tab on" data-screen="s-swipe"><div class="ic">◆</div><div class="lb">Discover</div></div>
+    <div class="tab" data-screen="s-matches"><div class="ic">💬</div><div class="lb">Collabs</div><div class="count" id="cMatch" style="display:none">0</div></div>
+    <div class="tab" data-screen="s-following"><div class="ic">▶</div><div class="lb">Following</div></div>
+    <div class="tab" data-screen="s-me"><div class="ic">👤</div><div class="lb">You</div></div>
+  </nav>
+</div>
+
+<script>
+/* =========================================================
+   DEMO DATA
+   `likesYou` is the simulated other side of the swipe.
+   In a real build this comes from the other user's actual swipe.
+   ========================================================= */
+const STREAMERS = [
+  { id:'nova', name:'Nova', emoji:'🎯', grad:'linear-gradient(150deg,#7c3aed,#db2777)',
+    platform:'Twitch', game:'Valorant', followers:'12.4K', schedule:'Tue/Thu/Sat · 8pm ET',
+    live:true, likesYou:true,
+    bio:"Immortal 2 peaker who mostly plays for the bits. My chat is unhinged in the best way. I edit my own clips at 3am and regret it every time.",
+    goals:['Duo queue ranked','Watch parties','Tournament casting'],
+    reply:"yooo finally someone whose schedule doesn't fight mine. Wanna run a duo grind Thursday?",
+    clips:[
+      {t:'1v4 clutch to close out the split',v:'184K views',d:'0:32',e:'🎯',g:'linear-gradient(140deg,#7c3aed,#db2777)'},
+      {t:'chat convinced me to play Deadlock. never again',v:'61K views',d:'1:04',e:'😩',g:'linear-gradient(140deg,#334155,#7c3aed)'},
+      {t:'the reload that ended my ranked career',v:'420K views',d:'0:14',e:'💀',g:'linear-gradient(140deg,#be123c,#f59e0b)'}
+    ]},
+
+  { id:'hermit', name:'PixelHermit', emoji:'⛏️', grad:'linear-gradient(150deg,#16a34a,#0891b2)',
+    platform:'YouTube', game:'Minecraft', followers:'48K', schedule:'Daily · 4pm ET',
+    live:false, likesYou:false,
+    bio:"Three years into one world. I build things nobody asked for. Slow, cozy, occasionally I explain redstone badly for 40 minutes.",
+    goals:['SMP server','Build battles','Long-form co-op series'],
+    reply:"hey! I've got room on the SMP if you want in.",
+    clips:[
+      {t:'I automated the entire village. it went wrong',v:'922K views',d:'12:40',e:'⛏️',g:'linear-gradient(140deg,#16a34a,#0891b2)'},
+      {t:'Year 3 world tour',v:'1.4M views',d:'24:11',e:'🏰',g:'linear-gradient(140deg,#0891b2,#6366f1)'}
+    ]},
+
+  { id:'kai', name:'KaiTheKid', emoji:'🎤', grad:'linear-gradient(150deg,#f59e0b,#ef4444)',
+    platform:'Kick', game:'Just Chatting / IRL', followers:'3.2K', schedule:'Weeknights · 9pm ET',
+    live:true, likesYou:true,
+    bio:"IRL streamer, mostly food trucks and bad decisions. Small channel but my 40 regulars would die for me. Looking to get out of my own head.",
+    goals:['IRL meetup stream','Podcast','Reaction nights'],
+    reply:"bro I've been trying to find someone for an IRL day. what city you in?",
+    clips:[
+      {t:'ordered the whole menu. mistake #1',v:'12K views',d:'2:20',e:'🌮',g:'linear-gradient(140deg,#f59e0b,#ef4444)'},
+      {t:'stranger joined my stream and stayed 3 hours',v:'8.4K views',d:'5:02',e:'🎤',g:'linear-gradient(140deg,#ef4444,#a855f7)'}
+    ]},
+
+  { id:'mochi', name:'Mochi', emoji:'🍡', grad:'linear-gradient(150deg,#f472b6,#a78bfa)',
+    platform:'Twitch', game:'Cozy games', followers:'27K', schedule:'Wed/Sun · 2pm ET',
+    live:false, likesYou:false,
+    bio:"Stardew, Animal Crossing, and the occasional crying-at-a-visual-novel stream. My community is very soft and I'd like to keep it that way.",
+    goals:['Co-op farm run','Charity stream','Art collabs'],
+    reply:"aw hi! I'd love to do a co-op farm sometime 🍡",
+    clips:[
+      {t:'perfect year 1 farm reveal',v:'240K views',d:'8:15',e:'🌾',g:'linear-gradient(140deg,#f472b6,#a78bfa)'},
+      {t:'I was not ready for that ending',v:'96K views',d:'3:41',e:'😭',g:'linear-gradient(140deg,#a78bfa,#38bdf8)'}
+    ]},
+
+  { id:'dusk', name:'Duskfall', emoji:'🕯️', grad:'linear-gradient(150deg,#1e293b,#7e22ce)',
+    platform:'Twitch', game:'Horror', followers:'8.9K', schedule:'Fri/Sat · 11pm ET',
+    live:true, likesYou:true,
+    bio:"Late night horror only. I scream, my chat laughs, we all lose sleep together. Been doing this for 4 years and still jump at doors.",
+    goals:['2-player horror co-op','Halloween marathon','Scary-story readings'],
+    reply:"finally. everyone I ask is too scared to do co-op horror with me lol",
+    clips:[
+      {t:'the door opened by itself and I left',v:'310K views',d:'0:48',e:'🚪',g:'linear-gradient(140deg,#1e293b,#7e22ce)'},
+      {t:'24hr horror marathon: hour 19',v:'88K views',d:'6:12',e:'🕯️',g:'linear-gradient(140deg,#7e22ce,#be123c)'}
+    ]},
+
+  { id:'brandon', name:'BigRigBrandon', emoji:'🏎️', grad:'linear-gradient(150deg,#0ea5e9,#1e40af)',
+    platform:'YouTube', game:'Sim racing', followers:'61K', schedule:'Sat/Sun · 12pm ET',
+    live:false, likesYou:false,
+    bio:"Full rig, full send. iRacing and truck sims. I take this way too seriously and my wife has stopped asking about the pedals.",
+    goals:['League races','Endurance team','Setup tutorials'],
+    reply:"we run an endurance team on Sundays, always need a driver.",
+    clips:[
+      {t:'last lap pass at Spa',v:'204K views',d:'1:55',e:'🏁',g:'linear-gradient(140deg,#0ea5e9,#1e40af)'},
+      {t:'24hr endurance: the pit stop that saved us',v:'77K views',d:'4:30',e:'🔧',g:'linear-gradient(140deg,#1e40af,#334155)'}
+    ]},
+
+  { id:'saoirse', name:'Saoirse', emoji:'⏱️', grad:'linear-gradient(150deg,#22c55e,#0d9488)',
+    platform:'Twitch', game:'Speedruns', followers:'5.1K', schedule:'Mon–Thu · 6pm ET',
+    live:false, likesYou:true,
+    bio:"Top 20 in two categories nobody's heard of. I explain frame-perfect tricks to an audience of nine people and love every second.",
+    goals:['Race streams','GDQ prep','Co-op runs'],
+    reply:"omg a race would be so fun. I'll go easy. (I won't)",
+    clips:[
+      {t:'new PB by 0.4 seconds and I cried',v:'44K views',d:'2:08',e:'⏱️',g:'linear-gradient(140deg,#22c55e,#0d9488)'},
+      {t:'explaining the skip that took 400 attempts',v:'19K views',d:'7:22',e:'🧠',g:'linear-gradient(140deg,#0d9488,#0ea5e9)'}
+    ]},
+
+  { id:'toast', name:'TOASTED', emoji:'🔥', grad:'linear-gradient(150deg,#f97316,#dc2626)',
+    platform:'Kick', game:'Fortnite', followers:'104K', schedule:'Daily · 3pm ET',
+    live:true, likesYou:false,
+    bio:"Loud. Fast. Probably yelling right now. Been grinding since chapter 1 and my thumbs are legally a weapon.",
+    goals:['Trio customs','Creator cup','Subathon'],
+    reply:"ayo let's run customs this weekend 🔥",
+    clips:[
+      {t:'20 kill solo squads no build',v:'1.1M views',d:'0:58',e:'🔥',g:'linear-gradient(140deg,#f97316,#dc2626)'},
+      {t:'this build fight shouldn\'t be legal',v:'640K views',d:'0:22',e:'🧱',g:'linear-gradient(140deg,#dc2626,#7c3aed)'}
+    ]},
+
+  { id:'lena', name:'LoFiLena', emoji:'🎧', grad:'linear-gradient(150deg,#6366f1,#0ea5e9)',
+    platform:'Twitch', game:'Music production', followers:'15.6K', schedule:'Tue/Fri · 7pm ET',
+    live:false, likesYou:true,
+    bio:"I make beats live and take terrible requests from chat. Also do stream intros and transitions for people who ask nicely.",
+    goals:['Make your stream music','Listening party','Beat battles'],
+    reply:"I'd love to make you an intro track — what's your vibe?",
+    clips:[
+      {t:'made a beat from a chat message in 20 min',v:'132K views',d:'19:40',e:'🎹',g:'linear-gradient(140deg,#6366f1,#0ea5e9)'},
+      {t:'beat battle finals',v:'58K views',d:'11:03',e:'🎧',g:'linear-gradient(140deg,#0ea5e9,#22d3ee)'}
+    ]},
+
+  { id:'gus', name:'GrimyGus', emoji:'⚔️', grad:'linear-gradient(150deg,#78350f,#292524)',
+    platform:'Twitch', game:'Souls games', followers:'2.4K', schedule:'Sun · all day',
+    live:false, likesYou:true,
+    bio:"Level 1 no-hit attempts, 400 deaths deep. Tiny channel, enormous patience. I will absolutely help you beat that boss on stream.",
+    goals:['Boss help co-op','Blind playthroughs','Lore nights'],
+    reply:"summon me. I'll carry. or die trying, mostly die",
+    clips:[
+      {t:'attempt 417',v:'9.8K views',d:'3:12',e:'⚔️',g:'linear-gradient(140deg,#78350f,#292524)'},
+      {t:'no-hit run ends in the dumbest way',v:'22K views',d:'0:41',e:'💀',g:'linear-gradient(140deg,#292524,#be123c)'}
+    ]},
+
+  { id:'ava', name:'AvaSpeaks', emoji:'🎙️', grad:'linear-gradient(150deg,#0d9488,#4338ca)',
+    platform:'YouTube', game:'Podcast / debate', followers:'33K', schedule:'Mon/Thu · 8pm ET',
+    live:false, likesYou:false,
+    bio:"Two hours, one topic, zero yelling. I bring on guests who disagree with me and we figure it out on air.",
+    goals:['Guest swap','Debate night','Interview series'],
+    reply:"I'd love to have you on. What could you talk about for an hour?",
+    clips:[
+      {t:'the guest who changed my mind on air',v:'380K views',d:'14:22',e:'🎙️',g:'linear-gradient(140deg,#0d9488,#4338ca)'},
+      {t:'clip that got taken out of context 400 times',v:'2.1M views',d:'0:39',e:'😐',g:'linear-gradient(140deg,#4338ca,#1e293b)'}
+    ]},
+
+  { id:'zeph', name:'Zephyr', emoji:'🌪️', grad:'linear-gradient(150deg,#e11d48,#7c3aed)',
+    platform:'Twitch', game:'Apex Legends', followers:'19K', schedule:'Wed–Sun · 9pm ET',
+    live:true, likesYou:true,
+    bio:"Movement demon, terrible aim, somehow it works. I've been looking for a consistent third for months and I'm not picky about rank.",
+    goals:['Ranked trio','Scrims','Late-night chill lobbies'],
+    reply:"THIRD FOUND. are you free tonight or am I being intense",
+    clips:[
+      {t:'the wall bounce into a 1v3',v:'520K views',d:'0:27',e:'🌪️',g:'linear-gradient(140deg,#e11d48,#7c3aed)'},
+      {t:'ranked to Pred: the meltdown episode',v:'140K views',d:'9:14',e:'📉',g:'linear-gradient(140deg,#7c3aed,#0ea5e9)'}
+    ]}
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let queue    = [];              // ids not yet swiped
+let matches  = [];              // mutual
+let follows  = [];              // one-sided (you liked, they didn't)
+let threads  = {};              // id -> [{who,text}]
+let activeId = null;
+let seenMatch = {};             // id -> true once opened
+
+const byId = id => STREAMERS.find(s => s.id === id);
+const $ = sel => document.querySelector(sel);
+
+function init(){
+  queue = STREAMERS.map(s => s.id);
+  matches = []; follows = []; threads = {}; seenMatch = {};
+  renderDeck(); renderLists(); renderMe();
+}
+
+/* =========================================================
+   SWIPE DECK
+   ========================================================= */
+function cardHTML(s){
+  return `
+    <div class="card-art" style="background:${s.grad}">
+      <div class="badges">
+        ${s.live ? '<div class="badge live"><i></i>LIVE</div>' : ''}
+        <div class="badge">${s.platform}</div>
+        <div class="badge">${s.game}</div>
+      </div>
+      ${s.emoji}
+    </div>
+    <div class="stamp yes">COLLAB</div>
+    <div class="stamp no">PASS</div>
+    <div class="card-body">
+      <div class="name-row"><div class="name">${s.name}</div><div class="plat">@${s.id}</div></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Followers</div><div class="v">${s.followers}</div></div>
+        <div class="stat"><div class="k">Usually live</div><div class="v">${s.schedule}</div></div>
+      </div>
+      <div class="bio">${s.bio}</div>
+      <div class="goal-label">Looking for</div>
+      <div class="tags">${s.goals.map(g => `<div class="tag">${g}</div>`).join('')}</div>
+    </div>`;
+}
+
+function renderDeck(){
+  const deck = $('#deck');
+  deck.innerHTML = '';
+  if(!queue.length){
+    deck.innerHTML = `<div class="empty"><div class="in">
+      <div style="font-size:44px;margin-bottom:12px">🫧</div>
+      <h3>That's everyone for now</h3>
+      <p>You've been through the whole deck. In a real build, new streamers would roll in as they join and as your filters widen.</p>
+      <button class="btn" onclick="init()">Reload the deck</button>
+    </div></div>`;
+    return;
+  }
+  // render up to 3, bottom-most first so the top card is last in DOM
+  const slice = queue.slice(0,3).reverse();
+  slice.forEach((id,i)=>{
+    const s = byId(id);
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.id = id;
+    const depth = slice.length - 1 - i;         // 0 = top
+    el.style.transform = `translateY(${depth*10}px) scale(${1 - depth*0.035})`;
+    el.style.zIndex = 10 + i;
+    el.innerHTML = cardHTML(s);
+    deck.appendChild(el);
+  });
+  attachDrag(deck.lastElementChild);
+}
+
+function attachDrag(card){
+  if(!card) return;
+  let sx=0, sy=0, dx=0, dy=0, dragging=false;
+
+  const down = e => {
+    if(e.target.closest('.bio') && e.type==='pointerdown' && e.pointerType==='touch') {/* still allow */}
+    dragging = true;
+    card.classList.remove('animate');
+    sx = e.clientX; sy = e.clientY;
+    card.setPointerCapture(e.pointerId);
+  };
+  const move = e => {
+    if(!dragging) return;
+    dx = e.clientX - sx; dy = e.clientY - sy;
+    card.style.transform = `translate(${dx}px,${dy}px) rotate(${dx*0.055}deg)`;
+    const p = Math.min(Math.abs(dx)/110, 1);
+    card.querySelector('.stamp.yes').style.opacity = dx > 0 ? p : 0;
+    card.querySelector('.stamp.no').style.opacity  = dx < 0 ? p : 0;
+  };
+  const up = () => {
+    if(!dragging) return;
+    dragging = false;
+    if(Math.abs(dx) > 95){
+      fly(card, dx > 0 ? 'yes' : 'no');
+    } else {
+      card.classList.add('animate');
+      card.style.transform = 'translate(0,0) rotate(0)';
+      card.querySelector('.stamp.yes').style.opacity = 0;
+      card.querySelector('.stamp.no').style.opacity  = 0;
+    }
+    dx = dy = 0;
+  };
+
+  card.addEventListener('pointerdown', down);
+  card.addEventListener('pointermove', move);
+  card.addEventListener('pointerup', up);
+  card.addEventListener('pointercancel', up);
+}
+
+function fly(card, dir){
+  const id = card.dataset.id;
+  card.classList.add('animate');
+  const x = dir === 'yes' ? 700 : -700;
+  card.style.transform = `translate(${x}px,-60px) rotate(${dir==='yes'?26:-26}deg)`;
+  card.style.opacity = 0;
+  setTimeout(()=>{ decide(id, dir); }, 190);
+}
+
+function swipeTop(dir){
+  const top = $('#deck').lastElementChild;
+  if(top && top.classList.contains('card')) fly(top, dir);
+}
+
+function decide(id, dir){
+  queue = queue.filter(q => q !== id);
+  const s = byId(id);
+
+  if(dir === 'yes'){
+    if(s.likesYou){
+      matches.push(id);
+      threads[id] = [{who:'sys', text:`You and ${s.name} both swiped. Chat unlocked.`}];
+      showMatch(s);
+    } else {
+      follows.push(id);
+      toast(`You're now following <b>${s.name}</b>. You can watch their clips — chat unlocks if they swipe you back.`);
+    }
+  }
+  renderDeck(); renderLists(); renderMe();
+}
+
+/* =========================================================
+   MATCH CELEBRATION
+   ========================================================= */
+function showMatch(s){
+  $('#matchAv').style.background = s.grad;
+  $('#matchAv').textContent = s.emoji;
+  $('#matchTitle').textContent = `You + ${s.name}`;
+  $('#matchLine').textContent = `${s.name} swiped you too. Chat is open — they're usually live ${s.schedule}.`;
+  $('#match').classList.add('open');
+  $('#matchChat').onclick = () => { $('#match').classList.remove('open'); openChat(s.id); };
+  $('#matchKeep').onclick = () => $('#match').classList.remove('open');
+}
+
+/* =========================================================
+   LISTS
+   ========================================================= */
+function rowHTML(s, sub, right){
+  return `<div class="row" data-id="${s.id}">
+    <div class="av" style="background:${s.grad}">${s.emoji}</div>
+    <div class="row-main">
+      <div class="n">${s.name} ${s.live?'<span style="width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block"></span>':''}</div>
+      <div class="m">${sub}</div>
+    </div>
+    ${right}
+  </div>`;
+}
+
+function renderLists(){
+  // matches
+  const ml = $('#matchList');
+  if(!matches.length){
+    ml.innerHTML = `<div class="blank"><div class="big">💬</div>No collabs yet.<br>Swipe ◆ on someone in Discover — if they swipe you back, they show up here with chat unlocked.</div>`;
+  } else {
+    ml.innerHTML = matches.map(id=>{
+      const s = byId(id);
+      const th = threads[id] || [];
+      const last = [...th].reverse().find(m => m.who !== 'sys');
+      const sub = last ? (last.who==='me' ? 'You: ' : '') + last.text : `Wants: ${s.goals[0].toLowerCase()}`;
+      const right = seenMatch[id] ? '<div class="chev">›</div>' : '<div class="new-dot"></div>';
+      return rowHTML(s, sub, right);
+    }).join('');
+    ml.querySelectorAll('.row').forEach(r => r.onclick = () => openChat(r.dataset.id));
+  }
+
+  // following
+  const fl = $('#followList');
+  if(!follows.length){
+    fl.innerHTML = `<div class="blank"><div class="big">▶</div>Nobody here yet.<br>When you swipe ◆ on someone who hasn't swiped you back, you become their follower and land here.</div>`;
+  } else {
+    fl.innerHTML = `<div class="section-h">${follows.length} streamer${follows.length>1?'s':''} · clips only</div>` +
+      follows.map(id=>{
+        const s = byId(id);
+        return rowHTML(s, `${s.followers} · ${s.game}`, '<div class="lock-pill">🔒 CHAT</div>');
+      }).join('');
+    fl.querySelectorAll('.row').forEach(r => r.onclick = () => openClips(r.dataset.id));
+  }
+
+  // tab badge
+  const unseen = matches.filter(id => !seenMatch[id]).length;
+  const c = $('#cMatch');
+  c.style.display = unseen ? 'grid' : 'none';
+  c.textContent = unseen;
+}
+
+function renderMe(){
+  $('#mCollabs').textContent  = matches.length;
+  $('#mFollowing').textContent = follows.length;
+  $('#mWaiting').textContent  = queue.filter(id => byId(id).likesYou).length;
+  $('#hdrNote').textContent = queue.length ? `${queue.length} in your deck` : 'deck empty';
+}
+
+/* =========================================================
+   CHAT
+   ========================================================= */
+function openChat(id){
+  hideToast();
+  activeId = id; seenMatch[id] = true;
+  const s = byId(id);
+  $('#chatAv').style.background = s.grad;
+  $('#chatAv').textContent = s.emoji;
+  $('#chatName').textContent = s.name;
+  $('#chatMeta').textContent = `${s.platform} · ${s.followers} · ${s.schedule}`;
+  drawMsgs();
+  $('#p-chat').classList.add('open');
+  renderLists();
+  setTimeout(()=>{
+    if(!(threads[id]||[]).some(m=>m.who==='them')){
+      threads[id].push({who:'them', text:s.reply});
+      drawMsgs(); renderLists();
+    }
+  }, 900);
+}
+
+function drawMsgs(){
+  const box = $('#chatMsgs');
+  box.innerHTML = (threads[activeId]||[]).map(m=>{
+    if(m.who==='sys') return `<div class="sysline">${m.text}</div>`;
+    return `<div class="msg ${m.who}">${m.text}</div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendMsg(){
+  const inp = $('#chatInput');
+  const t = inp.value.trim();
+  if(!t) return;
+  threads[activeId].push({who:'me', text:t});
+  inp.value = '';
+  drawMsgs(); renderLists();
+  const s = byId(activeId);
+  setTimeout(()=>{
+    const pool = [
+      "that works for me — what time?",
+      "yes. let's lock it in.",
+      "ok I'm actually hyped for this",
+      `sending you my ${s.platform} handle now`,
+      "want to do a test call first so it's not awkward on stream?"
+    ];
+    threads[activeId].push({who:'them', text: pool[Math.floor(Math.random()*pool.length)]});
+    drawMsgs(); renderLists();
+  }, 800);
+}
+
+/* =========================================================
+   CLIPS (follower view — chat locked)
+   ========================================================= */
+function openClips(id){
+  hideToast();
+  const s = byId(id);
+  $('#clipAv').style.background = s.grad;
+  $('#clipAv').textContent = s.emoji;
+  $('#clipName').textContent = s.name;
+  $('#clipMeta').textContent = `${s.followers} · you follow them`;
+  $('#clipList').innerHTML = s.clips.map(c=>`
+    <div class="clip">
+      <div class="clip-thumb" style="background:${c.g}">
+        <div class="play">▶</div>
+        <div class="dur">${c.d}</div>
+      </div>
+      <div class="clip-meta"><div class="t">${c.t}</div><div class="v">${c.v}</div></div>
+    </div>`).join('');
+  $('#clipLock').innerHTML = `🔒 <b>Chat is locked.</b><br>${s.name} hasn't swiped you back yet. You'll get a message thread the moment they do.`;
+  $('#p-clips').classList.add('open');
+}
+
+/* =========================================================
+   UI PLUMBING
+   ========================================================= */
+let toastT;
+function toast(html){
+  const t = $('#toast');
+  t.innerHTML = html;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.classList.remove('show'), 3600);
+}
+function hideToast(){ clearTimeout(toastT); $('#toast').classList.remove('show'); }
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('on');
+    $('#'+tab.dataset.screen).classList.add('active');
+  };
+});
+document.querySelectorAll('[data-close]').forEach(b=>{
+  b.onclick = () => $('#'+b.dataset.close).classList.remove('open');
+});
+$('#btnYes').onclick = () => swipeTop('yes');
+$('#btnNo').onclick  = () => swipeTop('no');
+$('#chatSend').onclick = sendMsg;
+$('#chatInput').addEventListener('keydown', e => { if(e.key==='Enter') sendMsg(); });
+$('#btnReset').onclick = () => {
+  init();
+  document.querySelector('.tab').click();
+  toast('Demo reset. Fresh deck, no collabs, no follows.');
+};
+
+init();
+</script>
+</body>
+</html>
