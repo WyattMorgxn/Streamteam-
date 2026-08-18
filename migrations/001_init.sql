@@ -1,5 +1,3 @@
--- StreamSwipe initial schema
-
 CREATE TABLE users (
   id            SERIAL PRIMARY KEY,
   twitch_id     TEXT UNIQUE NOT NULL,
@@ -38,7 +36,6 @@ CREATE TABLE matches (
   UNIQUE(user_a_id, user_b_id)
 );
 
--- One-way: created when swiper likes target but target hasn't liked back (yet)
 CREATE TABLE follows (
   id            SERIAL PRIMARY KEY,
   follower_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
