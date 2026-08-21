@@ -4,7 +4,6 @@ const { requireAuth } = require("./auth");
 
 const router = express.Router();
 
-// List my matches, with the other person's profile info
 router.get("/", requireAuth, async (req, res) => {
   const userId = req.user.userId;
   const { rows } = await pool.query(
@@ -13,20 +12,20 @@ router.get("/", requireAuth, async (req, res) => {
             p.display_name, p.avatar_url, p.game_category
      FROM matches m
      JOIN profiles p ON p.user_id = CASE WHEN m.user_a_id = $1 THEN m.user_b_id ELSE m.user_a_id END
-     WHERE m.user_a_id = $1 OR m.user_b_id = $1
+     WHERE (m.user_a_id = $1 OR m.user_b_id = $1)
+       AND m.hidden = false
      ORDER BY m.created_at DESC`,
     [userId]
   );
   res.json(rows);
 });
 
-// Get message history for one match (checks the requester is actually part of it)
 router.get("/:matchId/messages", requireAuth, async (req, res) => {
   const { matchId } = req.params;
   const userId = req.user.userId;
 
   const { rows: matchCheck } = await pool.query(
-    `SELECT 1 FROM matches WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)`,
+    `SELECT 1 FROM matches WHERE id = $1 AND hidden = false AND (user_a_id = $2 OR user_b_id = $2)`,
     [matchId, userId]
   );
   if (!matchCheck.length) return res.status(403).json({ error: "Not your match" });
@@ -38,7 +37,6 @@ router.get("/:matchId/messages", requireAuth, async (req, res) => {
   res.json(rows);
 });
 
-// Send a message (real-time delivery via WebSockets gets layered on top of this later)
 router.post("/:matchId/messages", requireAuth, async (req, res) => {
   const { matchId } = req.params;
   const userId = req.user.userId;
@@ -46,7 +44,7 @@ router.post("/:matchId/messages", requireAuth, async (req, res) => {
   if (!body || !body.trim()) return res.status(400).json({ error: "Message body required" });
 
   const { rows: matchCheck } = await pool.query(
-    `SELECT 1 FROM matches WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)`,
+    `SELECT 1 FROM matches WHERE id = $1 AND hidden = false AND (user_a_id = $2 OR user_b_id = $2)`,
     [matchId, userId]
   );
   if (!matchCheck.length) return res.status(403).json({ error: "Not your match" });
