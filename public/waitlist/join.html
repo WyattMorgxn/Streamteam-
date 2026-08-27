@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0810">
+<title>Join the waitlist — StreamTeam</title>
+<meta name="description" content="StreamTeam pairs you with streamers your own size. Join the waitlist.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0810;
+    --surface:#131020;
+    --field:#1a1528;
+    --line:#2a2340;
+    --line-soft:#221c34;
+    --text:#f4f2f8;
+    --muted:#9a92ae;
+    --muted-2:#6f677f;
+    --pink:#e8617f;
+    --purple:#a855f7;
+    --blue:#4da6ff;
+    --discord:#5865f2;
+    --grad:linear-gradient(95deg,#e8617f 0%,#b562d6 55%,#8b5cf6 100%);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  /* ---------- header ---------- */
+  header{
+    border-bottom:1px solid var(--line-soft);
+    padding:20px 28px;
+  }
+  .wordmark{
+    font-family:Archivo,sans-serif;font-weight:900;font-stretch:75%;
+    font-size:20px;letter-spacing:.5px;text-transform:uppercase;
+    background:linear-gradient(92deg,#e8617f 0%,#b562d6 40%,#4da6ff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-decoration:none;display:inline-block;
+  }
+
+  /* ---------- layout ---------- */
+  main{
+    max-width:520px;margin:0 auto;
+    padding:72px 24px 96px;
+  }
+  @media (max-width:600px){ main{padding:44px 20px 72px;} }
+
+  .mascot{
+    width:66px;height:66px;display:block;margin:0 auto 22px;
+    border-radius:18px;object-fit:cover;
+    box-shadow:0 0 0 1px var(--line),0 0 34px rgba(168,85,247,.28);
+  }
+
+  h1{
+    font-family:Archivo,sans-serif;font-weight:900;font-stretch:75%;
+    text-transform:uppercase;letter-spacing:.5px;
+    font-size:clamp(34px,7vw,44px);line-height:1;
+    text-align:center;margin:0 0 12px;
+  }
+  h1 .accent{
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{
+    text-align:center;color:var(--muted);
+    font-size:15px;line-height:1.55;margin:0 0 40px;
+  }
+
+  /* ---------- form ---------- */
+  .field{margin-bottom:22px;}
+  label{
+    display:block;
+    font-family:"JetBrains Mono",ui-monospace,monospace;
+    font-size:11.5px;letter-spacing:1.3px;text-transform:uppercase;
+    color:var(--muted);margin-bottom:9px;
+  }
+  input,select{
+    width:100%;
+    background:var(--field);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:15px 16px;
+    color:var(--text);
+    font-family:inherit;font-size:15px;
+    outline:none;
+    transition:border-color .16s ease,box-shadow .16s ease;
+  }
+  input::placeholder{color:#5e566f;}
+  input:focus,select:focus{
+    border-color:#7c4dd0;
+    box-shadow:0 0 0 3px rgba(139,92,246,.18);
+  }
+  select{
+    appearance:none;
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%239a92ae' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 16px center;
+    padding-right:44px;
+    cursor:pointer;
+  }
+  select:invalid{color:#5e566f;}
+  option{background:#1a1528;color:var(--text);}
+
+  /* ---------- consent ---------- */
+  .consent{
+    display:flex;gap:13px;align-items:flex-start;
+    background:var(--field);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px;
+    cursor:pointer;
+  }
+  .consent input{
+    width:19px;height:19px;flex:none;margin:1px 0 0;
+    accent-color:var(--purple);
+    cursor:pointer;
+  }
+  .consent span{font-size:14px;line-height:1.5;color:var(--text);}
+  .consent b{font-weight:600;}
+  .fineprint{
+    font-size:12.5px;line-height:1.55;color:var(--muted-2);
+    margin:11px 4px 30px;
+  }
+
+  /* ---------- button ---------- */
+  .cta{
+    width:100%;border:none;cursor:pointer;
+    background:var(--grad);
+    color:#160a12;
+    font-family:inherit;font-size:15.5px;font-weight:700;
+    padding:17px;border-radius:12px;
+    box-shadow:0 0 30px rgba(168,85,247,.34);
+    transition:transform .12s ease,box-shadow .16s ease,opacity .16s ease;
+  }
+  .cta:hover{box-shadow:0 0 42px rgba(168,85,247,.5);}
+  .cta:active{transform:translateY(1px);}
+  .cta:disabled{opacity:.55;cursor:wait;box-shadow:none;}
+  .back{
+    display:block;text-align:center;margin-top:22px;
+    color:var(--muted);font-size:14px;text-decoration:none;
+  }
+  .back:hover{color:var(--text);}
+
+  /* ---------- error ---------- */
+  .error{
+    display:none;
+    background:rgba(232,97,127,.1);
+    border:1px solid rgba(232,97,127,.4);
+    border-radius:10px;padding:13px 15px;
+    color:#ffb3c3;font-size:14px;line-height:1.5;
+    margin-bottom:20px;
+  }
+  .error.show{display:block;}
+
+  /* ---------- success ---------- */
+  #success{display:none;text-align:center;}
+  #success.show{display:block;}
+  .tick{
+    width:62px;height:62px;margin:0 auto 22px;border-radius:50%;
+    background:var(--grad);
+    display:grid;place-items:center;
+    box-shadow:0 0 34px rgba(168,85,247,.4);
+  }
+  .refbox{
+    background:var(--field);border:1px solid var(--line);
+    border-radius:14px;padding:20px;margin:28px 0 18px;text-align:left;
+  }
+  .refbox .k{
+    font-family:"JetBrains Mono",monospace;
+    font-size:11px;letter-spacing:1.3px;text-transform:uppercase;
+    color:var(--muted);margin-bottom:12px;
+  }
+  .reflink{
+    display:flex;gap:10px;align-items:center;
+  }
+  .reflink code{
+    flex:1;min-width:0;
+    font-family:"JetBrains Mono",monospace;font-size:13px;
+    color:#d8b4fe;background:#221b33;
+    padding:12px 14px;border-radius:9px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .copy{
+    flex:none;border:1px solid var(--line);background:#221b33;
+    color:var(--text);font-family:inherit;font-size:13px;font-weight:600;
+    padding:12px 15px;border-radius:9px;cursor:pointer;
+    transition:background .15s ease;
+  }
+  .copy:hover{background:#2c2442;}
+  .refnote{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0;}
+
+  /* ---------- discord invite ---------- */
+  /* Single-use link tied to this signup — hidden entirely if the API
+     couldn't issue one, so a null invite degrades quietly. */
+  #discordBox{display:none;margin-top:18px;}
+  #discordBox.show{display:block;}
+  #discordBox .reflink code{color:#c3c8ff;}
+  .discord-open{
+    flex:none;border:none;background:var(--discord);
+    color:#fff;font-family:inherit;font-size:13px;font-weight:600;
+    padding:12px 17px;border-radius:9px;cursor:pointer;
+    transition:filter .15s ease;
+  }
+  .discord-open:hover{filter:brightness(1.12);}
+  .discordnote{
+    color:var(--muted-2);font-size:12.5px;line-height:1.55;
+    margin:11px 4px 0;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Point this at your landing page URL -->
+  <a class="wordmark" href="index.html">StreamTeam</a>
+</header>
+
+<main>
+  <!-- FORM STATE -->
+  <div id="formState">
+    <img class="mascot" src="assets/mascot.jpg" alt="StreamTeam">
+
+    <h1>Join the <span class="accent">waitlist</span></h1>
+    <p class="lede">Takes about a minute. We'll email you the second you're in.</p>
+
+    <div class="error" id="error" role="alert"></div>
+
+    <form id="waitlistForm" novalidate>
+      <div class="field">
+        <label for="brand_name">Streamer / brand name</label>
+        <input id="brand_name" name="brand_name" type="text" placeholder="e.g. Mira_Plays" required maxlength="120" autocomplete="nickname">
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@stream.com" required autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label for="platform">Main platform</label>
+        <select id="platform" name="platform" required>
+          <option value="" disabled selected>Select one</option>
+          <option value="twitch">Twitch</option>
+          <option value="youtube">YouTube</option>
+          <option value="kick">Kick</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="handle">Channel link or handle</label>
+        <input id="handle" name="handle" type="text" placeholder="twitch.tv/yourname" maxlength="200">
+      </div>
+
+      <label class="consent" for="marketing_consent">
+        <input id="marketing_consent" name="marketing_consent" type="checkbox">
+        <span><b>Keep me posted</b> — send me marketing updates, streamer tips, and StreamTeam news.</span>
+      </label>
+      <p class="fineprint">
+        Unchecked by default. You'll get our one-time waitlist confirmation email either way — this box is only for future marketing emails.
+      </p>
+
+      <button class="cta" type="submit" id="submitBtn">Join the waitlist</button>
+    </form>
+
+    <a class="back" href="index.html">← Back</a>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div id="success">
+    <div class="tick">
+      <svg width="26" height="20" viewBox="0 0 26 20" fill="none" aria-hidden="true">
+        <path d="M2 10.5L9.5 18L24 2" stroke="#160a12" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 id="successTitle">You're <span class="accent">in</span></h1>
+    <p class="lede" id="successLede">Check your inbox — confirmation is on its way.</p>
+
+    <div class="refbox">
+      <div class="k">Your referral link</div>
+      <div class="reflink">
+        <code id="refLink">—</code>
+        <button class="copy" id="copyBtn" type="button">Copy</button>
+      </div>
+    </div>
+    <p class="refnote">Refer 3 streamers and you'll get <strong style="color:var(--text)">Founder</strong> status — early access ahead of everyone else.</p>
+
+    <div class="refbox" id="discordBox">
+      <div class="k">Your Discord invite</div>
+      <div class="reflink">
+        <code id="discordLink">—</code>
+        <button class="discord-open" id="discordBtn" type="button">Open</button>
+      </div>
+      <p class="discordnote">This link is yours alone and works once. We've emailed you a copy too.</p>
+    </div>
+
+    <a class="back" href="index.html">← Back to StreamTeam</a>
+  </div>
+</main>
+
+<script>
+  // ── Point this at your Railway API ─────────────────────────────
+  const API_URL = "https://streamteam-production.up.railway.app";
+  // ───────────────────────────────────────────────────────────────
+
+  const form      = document.getElementById("waitlistForm");
+  const btn       = document.getElementById("submitBtn");
+  const errorBox  = document.getElementById("error");
+  const formState = document.getElementById("formState");
+  const success   = document.getElementById("success");
+
+  // Carry a referral code through from ?ref=CODE if they arrived via someone's link
+  const incomingRef = new URLSearchParams(location.search).get("ref");
+
+  function showError(msg){
+    errorBox.textContent = msg;
+    errorBox.classList.add("show");
+    errorBox.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.classList.remove("show");
+
+    const brand = form.brand_name.value.trim();
+    const email = form.email.value.trim();
+
+    // Say what's wrong and how to fix it, rather than relying on the browser's default
+    if (!brand)  return showError("Add your streamer or brand name so we know who to greet.");
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return showError("That email doesn't look right — check for a typo.");
+    if (!form.platform.value) return showError("Pick your main platform so we can match you well.");
+
+    btn.disabled = true;
+    btn.textContent = "Joining…";
+
+    try {
+      const res = await fetch(`${API_URL}/waitlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brand_name: brand,
+          email,
+          platform: form.platform.value,
+          handle: form.handle.value.trim() || null,
+          marketing_consent: form.marketing_consent.checked,
+          ref: incomingRef,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong on our end. Try again in a moment.");
+
+      // Show them the referral link right here — people share it now or never
+      const link = `${location.origin}${location.pathname}?ref=${data.referral_code}`;
+      document.getElementById("refLink").textContent = link;
+      document.getElementById("copyBtn").dataset.link = link;
+
+      // Personal Discord invite. Stays hidden if the API couldn't issue one,
+      // rather than showing a dead link.
+      if (data.discord_invite) {
+        document.getElementById("discordLink").textContent = data.discord_invite;
+        document.getElementById("discordBtn").dataset.link = data.discord_invite;
+        document.getElementById("discordBox").classList.add("show");
+      }
+
+      if (data.already_signed_up) {
+        document.getElementById("successTitle").innerHTML = 'Already <span class="accent">on the list</span>';
+        document.getElementById("successLede").textContent = "You signed up with this email before — here's your referral link again.";
+      }
+
+      formState.style.display = "none";
+      success.classList.add("show");
+      window.scrollTo({top:0, behavior:"smooth"});
+
+    } catch (err) {
+      showError(err.message === "Failed to fetch"
+        ? "Couldn't reach the server. Check your connection and try again."
+        : err.message);
+      btn.disabled = false;
+      btn.textContent = "Join the waitlist";
+    }
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", async (e) => {
+    const link = e.target.dataset.link;
+    try {
+      await navigator.clipboard.writeText(link);
+      e.target.textContent = "Copied";
+      setTimeout(() => { e.target.textContent = "Copy"; }, 1800);
+    } catch {
+      // Clipboard API needs HTTPS — fall back to selecting the text so they can copy manually
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById("refLink"));
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+      e.target.textContent = "Select + copy";
+    }
+  });
+
+  document.getElementById("discordBtn").addEventListener("click", (e) => {
+    window.open(e.target.dataset.link, "_blank", "noopener");
+  });
+</script>
+</body>
+</html>
