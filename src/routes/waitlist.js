@@ -163,7 +163,7 @@ router.post("/", async (req, res) => {
     }
 
     // ── Send confirmation email (non-blocking — don't fail the request) ───
-    sendWaitlistConfirmation({ to: cleanEmail, brand_name: cleanBrand, referral_code })
+    sendWaitlistConfirmation({ to: cleanEmail, brand_name: cleanBrand, referral_code ,discord_invite})
       .catch((err) => console.error("[waitlist] email send failed:", err.message));
 
     return res.status(201).json({ referral_code, discord_invite, already_signed_up: false });

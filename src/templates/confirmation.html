@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to StreamTeam</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0c0715;font-family:Arial,Helvetica,sans-serif;">
+
+<div style="display:none;font-size:1px;color:#0c0715;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+Here's what happens next, plus your personal Discord invite.
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0c0715;padding:32px 16px;">
+<tr><td align="center">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#150d24;border-radius:16px;overflow:hidden;border:1px solid #2e2049;">
+
+<tr><td>
+<img src="{{asset_base}}/banner.jpg" width="600" alt="StreamTeam - Match. Collab. Grow. The network for streamers." style="width:100%;display:block;">
+</td></tr>
+
+<tr><td style="padding:8px 40px 0 40px;" align="center">
+<div style="display:inline-block;background:linear-gradient(90deg,#ff5f7e,#8b5cf6);padding:8px 20px;border-radius:999px;margin-top:-28px;position:relative;">
+<span style="color:#ffffff;font-size:12px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif;">You&#39;re officially on the list</span>
+</div>
+</td></tr>
+
+<tr><td style="padding:28px 40px 8px 40px;" align="center">
+<h1 style="margin:0;color:#ffffff;font-size:26px;line-height:1.3;font-family:Arial,sans-serif;">Welcome to the squad, {{brand_name}}.</h1>
+</td></tr>
+
+<tr><td style="padding:0 40px 24px 40px;" align="center">
+<p style="margin:0;color:#b8aed4;font-size:15px;line-height:1.6;font-family:Arial,sans-serif;">
+Congrats &#127881; You just joined the founding wave of StreamTeam &mdash; a matching app built to connect streamers your size for real collabs, not cold DMs. We&#39;re still building, and you&#39;re one of the first ones in the room.
+</p>
+</td></tr>
+
+<tr><td style="padding:0 40px 8px 40px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1e1433;border-radius:12px;border:1px solid #33234f;">
+<tr><td style="padding:22px 24px;">
+<table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td valign="top" style="padding-right:14px;">
+<img src="{{asset_base}}/mascot.jpg" width="44" height="44" alt="StreamTeam mascot" style="display:block;border-radius:10px;">
+</td>
+<td valign="top">
+<p style="margin:0 0 4px 0;color:#ffffff;font-size:15px;font-weight:bold;font-family:Arial,sans-serif;">You&#39;ve got good taste</p>
+<p style="margin:0;color:#b8aed4;font-size:13.5px;line-height:1.55;font-family:Arial,sans-serif;">You were hand-picked by our socials team to join this waitlist, so we trust your judgment. Signing up puts you in the running for Founder status &mdash; refer 3 streamers who join and it&#39;s locked in, along with priority matching the moment we open the doors.</p>
+</td>
+</tr></table>
+</td></tr>
+</table>
+</td></tr>
+
+<!-- Referral link, shown in full as well as linked. People forward these to
+     friends, and a bare URL survives forwarding better than a button does. -->
+<tr><td style="padding:20px 40px 0 40px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1030;border-radius:10px;border:1px solid #2e2049;">
+<tr><td style="padding:16px 20px;">
+<p style="margin:0 0 8px 0;color:#6b6084;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif;">Your referral link</p>
+<a href="{{referral_link}}" style="color:#c4a5ff;font-size:13px;font-family:'Courier New',Courier,monospace;word-break:break-all;text-decoration:none;">{{referral_link}}</a>
+</td></tr>
+</table>
+</td></tr>
+
+<tr><td style="padding:16px 40px 0 40px;" align="center">
+<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:8px;background:linear-gradient(90deg,#ff5f7e,#8b5cf6);">
+<a href="{{referral_link}}" style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;font-family:Arial,sans-serif;">Share your link</a>
+</td></tr></table>
+</td></tr>
+
+{{#if discord_invite}}
+<!-- Personal, single-use invite. This email is the only durable copy — the
+     signup page is gone once they close the tab. -->
+<tr><td style="padding:28px 40px 8px 40px;" align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+<td style="border-top:1px solid #2e2049;padding-top:20px;" align="center">
+<p style="margin:0 0 12px 0;color:#ffffff;font-size:15px;font-weight:bold;font-family:Arial,sans-serif;">Want in on the day-to-day?</p>
+<p style="margin:0 0 16px 0;color:#b8aed4;font-size:13.5px;line-height:1.55;font-family:Arial,sans-serif;">Join the StreamTeam Discord for early looks, streamer spotlights, and first dibs when manual matching starts. This invite is yours alone and works once &mdash; hang onto this email.</p>
+</td>
+</tr></table>
+</td></tr>
+
+<tr><td style="padding:0 40px 8px 40px;" align="center">
+<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:8px;background-color:#5865f2;">
+<a href="{{discord_invite}}" style="display:inline-block;padding:13px 30px;color:#ffffff;font-size:14.5px;font-weight:bold;text-decoration:none;font-family:Arial,sans-serif;">Join the Discord &rarr;</a>
+</td></tr></table>
+</td></tr>
+
+<tr><td style="padding:0 40px 32px 40px;" align="center">
+<p style="margin:0;color:#6b6084;font-size:12px;line-height:1.5;font-family:Arial,sans-serif;word-break:break-all;">{{discord_invite}}</p>
+</td></tr>
+{{/if}}
+
+<tr><td style="padding:20px 40px 32px 40px;border-top:1px solid #2e2049;" align="center">
+<p style="margin:0;color:#6b6084;font-size:12px;line-height:1.6;font-family:Arial,sans-serif;">
+You&#39;re receiving this because you joined the StreamTeam waitlist.<br>
+{{#if unsubscribe_url}}<a href="{{unsubscribe_url}}" style="color:#8b5cf6;">Unsubscribe</a> &nbsp;&middot;&nbsp; {{/if}}StreamTeam &middot; Not affiliated with Twitch, YouTube, or Kick.
+</p>
+</td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
