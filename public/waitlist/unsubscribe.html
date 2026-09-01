@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0810">
+<meta name="robots" content="noindex">
+<title>Unsubscribe — StreamTeam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0810;
+    --field:#1a1528;
+    --line:#2a2340;
+    --line-soft:#221c34;
+    --text:#f4f2f8;
+    --muted:#9a92ae;
+    --muted-2:#6f677f;
+    --grad:linear-gradient(95deg,#e8617f 0%,#b562d6 55%,#8b5cf6 100%);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  header{
+    border-bottom:1px solid var(--line-soft);
+    padding:20px 28px;
+  }
+  .wordmark{
+    font-family:Archivo,sans-serif;font-weight:900;font-stretch:75%;
+    font-size:20px;letter-spacing:.5px;text-transform:uppercase;
+    background:linear-gradient(92deg,#e8617f 0%,#b562d6 40%,#4da6ff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-decoration:none;display:inline-block;
+  }
+
+  main{
+    max-width:480px;margin:0 auto;
+    padding:80px 24px 96px;
+    text-align:center;
+  }
+  @media (max-width:600px){ main{padding:52px 20px 72px;} }
+
+  h1{
+    font-family:Archivo,sans-serif;font-weight:900;font-stretch:75%;
+    text-transform:uppercase;letter-spacing:.5px;
+    font-size:clamp(28px,6vw,36px);line-height:1.05;
+    margin:0 0 14px;
+  }
+  h1 .accent{
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  p.lede{
+    color:var(--muted);
+    font-size:15px;line-height:1.6;margin:0 0 32px;
+  }
+  .who{
+    display:inline-block;
+    font-family:"JetBrains Mono",monospace;font-size:13px;
+    color:#d8b4fe;background:#221b33;
+    padding:10px 16px;border-radius:9px;
+    margin-bottom:32px;word-break:break-all;
+  }
+
+  button{
+    width:100%;border:none;cursor:pointer;
+    font-family:inherit;font-size:15.5px;font-weight:700;
+    padding:16px;border-radius:12px;
+    transition:transform .12s ease,box-shadow .16s ease,opacity .16s ease;
+  }
+  .confirm{
+    background:var(--grad);color:#160a12;
+    box-shadow:0 0 30px rgba(168,85,247,.3);
+  }
+  .confirm:hover{box-shadow:0 0 42px rgba(168,85,247,.46);}
+  .confirm:active{transform:translateY(1px);}
+  .confirm:disabled{opacity:.55;cursor:wait;box-shadow:none;}
+
+  .back{
+    display:block;margin-top:22px;
+    color:var(--muted);font-size:14px;text-decoration:none;
+  }
+  .back:hover{color:var(--text);}
+
+  .tick{
+    width:58px;height:58px;margin:0 auto 22px;border-radius:50%;
+    background:var(--grad);
+    display:grid;place-items:center;
+    box-shadow:0 0 34px rgba(168,85,247,.36);
+  }
+
+  .note{
+    color:var(--muted-2);font-size:13px;line-height:1.6;
+    margin:26px 0 0;
+  }
+
+  .state{display:none;}
+  .state.show{display:block;}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="wordmark" href="index.html">StreamTeam</a>
+</header>
+
+<main>
+  <!-- LOADING -->
+  <div class="state show" id="loading">
+    <p class="lede">Checking your link…</p>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="state" id="confirm">
+    <h1>Unsubscribe from <span class="accent">updates</span>?</h1>
+    <p class="lede">You'll stop getting StreamTeam marketing emails. We'll still send you the important one when your spot opens.</p>
+    <div class="who" id="whoEmail">—</div>
+    <button class="confirm" id="confirmBtn" type="button">Yes, unsubscribe me</button>
+    <a class="back" href="index.html">Never mind, keep me subscribed</a>
+  </div>
+
+  <!-- DONE -->
+  <div class="state" id="done">
+    <div class="tick">
+      <svg width="24" height="19" viewBox="0 0 26 20" fill="none" aria-hidden="true">
+        <path d="M2 10.5L9.5 18L24 2" stroke="#160a12" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>You're <span class="accent">unsubscribed</span></h1>
+    <p class="lede">You won't get any more marketing emails from us.</p>
+    <p class="note">Still on the waitlist though — we'll email you when your spot opens. Changed your mind? Sign up again with the same email.</p>
+    <a class="back" href="index.html">← Back to StreamTeam</a>
+  </div>
+
+  <!-- ALREADY -->
+  <div class="state" id="already">
+    <h1>Already <span class="accent">unsubscribed</span></h1>
+    <p class="lede">You're not on the marketing list, so there's nothing to do here.</p>
+    <a class="back" href="index.html">← Back to StreamTeam</a>
+  </div>
+
+  <!-- ERROR -->
+  <div class="state" id="error">
+    <h1>Link didn't <span class="accent">work</span></h1>
+    <p class="lede" id="errorMsg">That unsubscribe link isn't valid. It may have been copied incompletely.</p>
+    <p class="note">Reply to any StreamTeam email and we'll take you off the list by hand.</p>
+    <a class="back" href="index.html">← Back to StreamTeam</a>
+  </div>
+</main>
+
+<script>
+  // ── Point this at your Railway API ─────────────────────────────
+  const API_URL = "https://streamteam-production.up.railway.app";
+  // ───────────────────────────────────────────────────────────────
+
+  const token = new URLSearchParams(location.search).get("t");
+
+  function show(id){
+    document.querySelectorAll(".state").forEach(el => el.classList.remove("show"));
+    document.getElementById(id).classList.add("show");
+  }
+
+  function showError(msg){
+    if (msg) document.getElementById("errorMsg").textContent = msg;
+    show("error");
+  }
+
+  // Look up the token on load. This deliberately does NOT unsubscribe —
+  // mail scanners prefetch links, and a one-click opt-out would fire for
+  // people who never clicked.
+  (async () => {
+    if (!token) return showError("This link is missing its unsubscribe code.");
+
+    try {
+      const res = await fetch(`${API_URL}/unsubscribe?t=${encodeURIComponent(token)}`);
+      const data = await res.json();
+
+      if (!res.ok) return showError(data.error);
+      if (data.already_unsubscribed) return show("already");
+
+      document.getElementById("whoEmail").textContent = data.email;
+      show("confirm");
+    } catch {
+      showError("Couldn't reach the server. Check your connection and try again.");
+    }
+  })();
+
+  document.getElementById("confirmBtn").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    e.target.textContent = "Unsubscribing…";
+
+    try {
+      const res = await fetch(`${API_URL}/unsubscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+      show("done");
+    } catch (err) {
+      showError(err.message === "Failed to fetch"
+        ? "Couldn't reach the server. Check your connection and try again."
+        : err.message);
+    }
+  });
+</script>
+</body>
+</html>

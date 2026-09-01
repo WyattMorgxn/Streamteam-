@@ -38,6 +38,15 @@ function generateReferralCode() {
   return crypto.randomBytes(4).toString("hex"); // e.g. "a3f9c12b"
 }
 
+/**
+ * Long random token used to authenticate an unsubscribe request. This is a
+ * credential rather than something anyone types, so it's sized to resist
+ * guessing instead of to be short.
+ */
+function generateUnsubscribeToken() {
+  return crypto.randomBytes(24).toString("hex");
+}
+
 router.post("/", async (req, res) => {
   const {
     brand_name,
@@ -101,6 +110,7 @@ router.post("/", async (req, res) => {
     // ── Insert ────────────────────────────────────────────────────────────
     let referral_code;
     let newId = null;
+    let unsubscribe_token = null;
 
     // Retry loop in case of referral_code collision (extremely unlikely but safe)
     while (!newId) {
@@ -108,12 +118,22 @@ router.post("/", async (req, res) => {
       try {
         const ins = await pool.query(
           `INSERT INTO waitlist
-             (email, brand_name, platform, handle, marketing_consent, referral_code, referred_by)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)
-           RETURNING id`,
-          [cleanEmail, cleanBrand, platform, cleanHandle, cleanConsent, referral_code, verifiedRef]
+             (email, brand_name, platform, handle, marketing_consent, referral_code, referred_by, unsubscribe_token)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           RETURNING id, unsubscribe_token`,
+          [
+            cleanEmail,
+            cleanBrand,
+            platform,
+            cleanHandle,
+            cleanConsent,
+            referral_code,
+            verifiedRef,
+            generateUnsubscribeToken(),
+          ]
         );
         newId = ins.rows[0].id;
+        unsubscribe_token = ins.rows[0].unsubscribe_token;
       } catch (err) {
         // Unique violation on referral_code — retry with a new code
         if (err.code === "23505" && err.constraint && err.constraint.includes("referral_code")) {
@@ -155,7 +175,7 @@ router.post("/", async (req, res) => {
         );
         if (flip.rows.length > 0) {
           console.log("[waitlist] founder unlocked:", flip.rows[0].email);
-          // TODO: sendFounderAchievedEmail(flip.rows[0])
+          // TODO: sendFounderAchieved(flip.rows[0])
         }
       } catch (err) {
         console.error("[waitlist] founder flip failed:", err.message);
@@ -163,8 +183,13 @@ router.post("/", async (req, res) => {
     }
 
     // ── Send confirmation email (non-blocking — don't fail the request) ───
-    sendWaitlistConfirmation({ to: cleanEmail, brand_name: cleanBrand, referral_code ,discord_invite})
-      .catch((err) => console.error("[waitlist] email send failed:", err.message));
+    sendWaitlistConfirmation({
+      to: cleanEmail,
+      brand_name: cleanBrand,
+      referral_code,
+      discord_invite,
+      unsubscribe_token,
+    }).catch((err) => console.error("[waitlist] email send failed:", err.message));
 
     return res.status(201).json({ referral_code, discord_invite, already_signed_up: false });
 

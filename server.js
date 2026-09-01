@@ -10,6 +10,7 @@ const followsRouter = require("./src/routes/follows");
 const blocksRouter = require("./src/routes/blocks");
 const reportsRouter = require("./src/routes/reports");
 const waitlistRouter = require("./src/routes/waitlist");
+const unsubscribeRouter = require("./src/routes/unsubscribe");
 
 const app = express();
 app.use(cors());
@@ -25,6 +26,7 @@ app.use("/follows", followsRouter);
 app.use("/blocks", blocksRouter);
 app.use("/reports", reportsRouter);
 app.use("/waitlist", waitlistRouter);
+app.use("/unsubscribe", unsubscribeRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`streamteam-api listening on port ${PORT}`));
